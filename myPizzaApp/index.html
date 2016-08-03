@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myPizza">
+  <head>
+    <meta charset="utf-8">
+    <title>My Pizza App</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/angular.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <script>
+      angular.module("myPizza", []);
+      angular.module("myPizza").controller("myPizzaCtrl", function($scope){
+          $scope.name = "My Pizza";
+          $scope.clients = [
+            {name: "Peter", tel:"5555-5555", address:"645 SW Ave"},
+            {name: "Mary", tel:"6666-5555", address:"433 ST Ave"},
+            {name: "Liza", tel:"3333-5555", address:"12 AP Ave"}
+          ];
+
+          $scope.addClient = function(client){
+            $scope.clients.push(angular.copy(client)); //copy the data to not link the value
+            delete $scope.client;
+          };
+
+          $scope.editClient = function(client){
+            $scope.client = client;
+            $scope.editing = true;
+          };
+
+          $scope.saveClient = function(client){
+            client = angular.copy($scope.client);
+            delete $scope.client;
+            $scope.editing = false;
+          };
+
+          $scope.deleteClient = function(id){
+            $scope.clients.splice(id,1);
+          };
+      });
+    </script>
+
+  </head>
+
+  <body>
+    <section class="container" ng-controller="myPizzaCtrl">
+      <div class="row">
+        <h1 class="text-center" ng-bind="name"></h1>
+      </div>
+
+      <div class="row">
+        <div class="form-inline text-center">
+          <div class="form-group pull-left">
+            <input type="text" ng-model="search" class="form-cotrol" placeholder="Search">
+          </div>
+
+          <div class="form-group">
+            <input type="text" ng-model="client.name" class="form-cotrol" placeholder="Name">
+          </div>
+          <div class="form-group">
+            <input type="text" ng-model="client.tel" class="form-cotrol" placeholder="Tel">
+          </div>
+          <div class="form-group">
+            <input type="text" ng-model="client.address" class="form-cotrol" placeholder="Address">
+          </div>
+          <div class="form-group">
+            <button ng-hide="editing" ng-click="addClient(client);" class="btn btn-success">Add</button>
+            <button ng-show="editing" ng-click="saveClient(client);" class="btn btn-info">Salve</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Tel</th>
+              <th>Address</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr ng-repeat="client in clients | filter:search">
+              <td>{{ client.name }}</td>
+              <td>{{ client.tel }}</td>
+              <td>{{ client.address }}</td>
+              <td>
+                <button ng-click="editClient(client);" class="btn btn-default">Edit</button>
+                <button ng-click="deleteClient(client);" class="btn btn-danger">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+  </body>
+</html>
