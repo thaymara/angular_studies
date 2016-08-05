@@ -1,17 +1,212 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 module.exports = function($scope){
-  $scope.name = "Evolving with Angular JS";
+  $scope.name = "My Pizza App with Angular and nodejs";
+  $scope.clients = [
+    {name: "Peter", tel:"5555-5555", address:"645 SW Ave"},
+    {name: "Mary", tel:"6666-5555", address:"433 ST Ave"},
+    {name: "Liza", tel:"3333-5555", address:"12 AP Ave"}
+  ];
+  $scope.day = new Date();
+  $scope.total = 27.35;
+
+  $scope.addClient = function(client){
+    $scope.clients.push(angular.copy(client)); //copy the data to not link the value
+    $scope.formClient.$setPristine();
+    delete $scope.client;
+  };
+
+  $scope.editClient = function(client){
+    $scope.client = client;
+    $scope.editing = true;
+  };
+
+  $scope.saveClient = function(client){
+    client = angular.copy($scope.client);
+    $scope.formClient.$setPristine();
+    delete $scope.client;
+    $scope.editing = false;
+  };
+
+  $scope.deleteClient = function(client){
+    $scope.clients.splice($scope.clients.indexOf(client), 1);
+  };
+
+  $scope.orderBy = function(col){
+    $scope.order = col;
+    $scope.reverse = !$scope.reverse; //alterna o valor entre true e false (primeira vez que clica é false)
+  };
 };
 
 },{}],2:[function(require,module,exports){
+module.exports = function(){
+  return {
+    require: "ngModel",
+    link: function(scope, element, attributes, ctrl){
+      element.bind("keyup", function(){
+        //console.log(ctrl.$viewvalue);
+        var _formatTel = function(value){
+          value = value.replace(/[^0-9]+/g, "");
+          if(value.length > 4 && value.length <= 8){
+            value = value.substring(0,4) + "-" + value.substring(4,8);
+          }else if(value.length > 4){
+            value = value.substring(0,5) + "-" + value.substring(5,9);
+          }
+          return value;
+        };
+        ctrl.$setViewValue(_formatTel(ctrl.$viewValue));
+        ctrl.$render();
+      });
+
+      // function to remove the dash to save in data base
+      /* ctrl.$parsers.push(function(value)){
+        if(value.length > 8){
+          value = value.replace(/[^0-9]+/g, "");
+          return value;
+        }
+      }; */
+    }
+  };
+};
+
+},{}],3:[function(require,module,exports){
 require('angular');
+require('./locale/angular-locale_pt-br.js');
 
 var MainController = require('./controllers/MainController.js');
+var maskTel = require('./directives/maskTel.js');
 
 angular.module('app', []);
 angular.module('app', []).controller('MainController', ['$scope', MainController]);
+angular.module('app').directive('maskTel', [maskTel]);
 
-},{"./controllers/MainController.js":1,"angular":4}],3:[function(require,module,exports){
+},{"./controllers/MainController.js":1,"./directives/maskTel.js":2,"./locale/angular-locale_pt-br.js":4,"angular":6}],4:[function(require,module,exports){
+'use strict';
+angular.module("ngLocale", [], ["$provide", function($provide) {
+var PLURAL_CATEGORY = {ZERO: "zero", ONE: "one", TWO: "two", FEW: "few", MANY: "many", OTHER: "other"};
+$provide.value("$locale", {
+  "DATETIME_FORMATS": {
+    "AMPMS": [
+      "AM",
+      "PM"
+    ],
+    "DAY": [
+      "domingo",
+      "segunda-feira",
+      "ter\u00e7a-feira",
+      "quarta-feira",
+      "quinta-feira",
+      "sexta-feira",
+      "s\u00e1bado"
+    ],
+    "ERANAMES": [
+      "antes de Cristo",
+      "depois de Cristo"
+    ],
+    "ERAS": [
+      "a.C.",
+      "d.C."
+    ],
+    "FIRSTDAYOFWEEK": 6,
+    "MONTH": [
+      "janeiro",
+      "fevereiro",
+      "mar\u00e7o",
+      "abril",
+      "maio",
+      "junho",
+      "julho",
+      "agosto",
+      "setembro",
+      "outubro",
+      "novembro",
+      "dezembro"
+    ],
+    "SHORTDAY": [
+      "dom",
+      "seg",
+      "ter",
+      "qua",
+      "qui",
+      "sex",
+      "s\u00e1b"
+    ],
+    "SHORTMONTH": [
+      "jan",
+      "fev",
+      "mar",
+      "abr",
+      "mai",
+      "jun",
+      "jul",
+      "ago",
+      "set",
+      "out",
+      "nov",
+      "dez"
+    ],
+    "STANDALONEMONTH": [
+      "janeiro",
+      "fevereiro",
+      "mar\u00e7o",
+      "abril",
+      "maio",
+      "junho",
+      "julho",
+      "agosto",
+      "setembro",
+      "outubro",
+      "novembro",
+      "dezembro"
+    ],
+    "WEEKENDRANGE": [
+      5,
+      6
+    ],
+    "fullDate": "EEEE, d 'de' MMMM 'de' y",
+    "longDate": "d 'de' MMMM 'de' y",
+    "medium": "d 'de' MMM 'de' y HH:mm:ss",
+    "mediumDate": "d 'de' MMM 'de' y",
+    "mediumTime": "HH:mm:ss",
+    "short": "dd/MM/yy HH:mm",
+    "shortDate": "dd/MM/yy",
+    "shortTime": "HH:mm"
+  },
+  "NUMBER_FORMATS": {
+    "CURRENCY_SYM": "R$",
+    "DECIMAL_SEP": ",",
+    "GROUP_SEP": ".",
+    "PATTERNS": [
+      {
+        "gSize": 3,
+        "lgSize": 3,
+        "maxFrac": 3,
+        "minFrac": 0,
+        "minInt": 1,
+        "negPre": "-",
+        "negSuf": "",
+        "posPre": "",
+        "posSuf": ""
+      },
+      {
+        "gSize": 3,
+        "lgSize": 3,
+        "maxFrac": 2,
+        "minFrac": 2,
+        "minInt": 1,
+        "negPre": "-\u00a4",
+        "negSuf": "",
+        "posPre": "\u00a4",
+        "posSuf": ""
+      }
+    ]
+  },
+  "id": "pt-br",
+  "localeID": "pt_BR",
+  "pluralCat": function(n, opt_precision) {  if (n >= 0 && n <= 2 && n != 2) {    return PLURAL_CATEGORY.ONE;  }  return PLURAL_CATEGORY.OTHER;}
+});
+}]);
+
+},{}],5:[function(require,module,exports){
 /**
  * @license AngularJS v1.5.8
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -31780,8 +31975,8 @@ $provide.value("$locale", {
 })(window);
 
 !window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 require('./angular');
 module.exports = angular;
 
-},{"./angular":3}]},{},[2])
+},{"./angular":5}]},{},[3])
